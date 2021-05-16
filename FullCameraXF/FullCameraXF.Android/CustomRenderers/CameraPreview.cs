@@ -106,7 +106,6 @@ namespace FullCameraXF.Droid.CustomRenderers
                 this.Preview.SetParameters(camParameters);
 
             });
-
         }
 
         internal void Unsubscribe()

@@ -11,7 +11,7 @@ namespace FullCameraXF
         {
             InitializeComponent();
 
-            MainPage = new NavigationPage( new CameraPage());
+            MainPage = new NavigationPage( new MainPage());
         }
 
         protected override void OnStart()

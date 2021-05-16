@@ -8,7 +8,50 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <customRenderers:CameraPreview x:Name="cameraPreview" Grid.Row="0" Camera="Rear" HorizontalOptions="FillAndExpand" InputTransparent="True" VerticalOptions="FillAndExpand"/>
-        
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="128"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="1" BackgroundColor="#151515">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                    ImageSource="icon_flash_on"
+                    Clicked="OnToggleFlashLight"
+                    BackgroundColor="Transparent"
+                    IsVisible="{Binding FlashLightOn }"
+                         
+                    />
+                <Button Grid.Column="0"
+                    ImageSource="icon_flash_off"
+                    Clicked="OnToggleFlashLight"
+                    BackgroundColor="Transparent"
+                    IsVisible="{Binding FlashLightOn, Converter={StaticResource InverseBoolConverter} }"
+                         
+                    />
+                <ImageButton Grid.Column="1"
+                    Source="icon_camera_switch" 
+                    Clicked="OnSwitchCamera"
+                    BackgroundColor="Transparent"
+                    HorizontalOptions="Center"
+                    />
+                <ImageButton Grid.Column="2"
+                    Source="icon_camera"  
+                    BackgroundColor="Transparent"
+                    HorizontalOptions="Center"
+                    />
+                <ImageButton Grid.Column="3"
+                    Source="icon_go"
+                    BackgroundColor="Transparent"   
+                        />
+
+            </Grid>
+        </Grid>
 
     </Grid>
 </ContentPage>

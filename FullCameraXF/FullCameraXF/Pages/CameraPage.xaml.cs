@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FullCameraXF.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,9 +13,51 @@ namespace FullCameraXF.Pages
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class CameraPage : ContentPage
     {
+        public CameraPageViewModel _viewModel { get; set; }
         public CameraPage()
         {
             InitializeComponent();
+            _viewModel = new CameraPageViewModel();
+            BindingContext = _viewModel;
+        }
+
+        public void OnToggleFlashLight(object sender, System.EventArgs e)
+        {
+
+            if (!_viewModel.FlashLightOn)
+            {
+                MessagingCenter.Send<object>(this, "ToggleFlashLightOn");
+                _viewModel.FlashLightOn = true;
+            }
+
+            else
+            {
+                MessagingCenter.Send<object>(this, "ToggleFlashLightOff");
+                _viewModel.FlashLightOn = false;
+            }
+        }
+        public void OnSwitchCamera(object sender, System.EventArgs e)
+        {
+
+            if (cameraPreview.Camera == ViewComponents.CustomRenderers.CameraOptions.Rear)
+                cameraPreview.Camera = ViewComponents.CustomRenderers.CameraOptions.Front;
+            else
+                cameraPreview.Camera = ViewComponents.CustomRenderers.CameraOptions.Rear;
+        }
+
+        protected override void OnDisappearing()
+        {
+      
+            base.OnDisappearing();
+            cameraPreview.OnUnsubscribe();
+ 
+        }
+        protected override void OnAppearing()
+        {
+    
+            base.OnDisappearing(); 
+            cameraPreview.OnSubscribe();
+ 
         }
     }
 }
