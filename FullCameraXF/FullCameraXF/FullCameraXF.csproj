@@ -16,11 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DataStores\" />
     <Folder Include="Models\" />
     <Folder Include="Resources\" />
-    <Folder Include="ViewComponents\CustomRenderers\" />
-    <Folder Include="ViewModels\" />
   </ItemGroup>
 
   <ItemGroup>

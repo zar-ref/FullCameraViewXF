@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FullCameraXF.Pages;
+using System;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -10,7 +11,7 @@ namespace FullCameraXF
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            MainPage = new NavigationPage( new CameraPage());
         }
 
         protected override void OnStart()
