@@ -87,6 +87,7 @@ namespace FullCameraXF.Droid.CustomRenderers
                 }
 
 
+
             });
 
 
