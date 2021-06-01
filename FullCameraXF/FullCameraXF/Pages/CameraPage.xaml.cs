@@ -53,8 +53,7 @@ namespace FullCameraXF.Pages
  
         }
         protected override void OnAppearing()
-        {
-    
+        { 
             base.OnDisappearing(); 
             cameraPreview.OnSubscribe();
  

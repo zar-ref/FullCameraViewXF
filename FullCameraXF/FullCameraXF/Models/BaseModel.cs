@@ -4,26 +4,10 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace FullCameraXF.ViewModels
+namespace FullCameraXF.Models
 {
-    public class BaseViewModel : INotifyPropertyChanged
+    public class BaseModel : INotifyPropertyChanged
     {
-        bool isLoading = false;
-        public bool IsLoading
-        {
-            get
-            {
-                return isLoading;
-            }
-            set
-            {
-                isLoading = value;
-                OnPropertyChanged("IsLoading");
-            }
-        }
-
-        #region INotifyPropertyChanged
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = "")
@@ -34,7 +18,5 @@ namespace FullCameraXF.ViewModels
 
             changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        #endregion
-
     }
 }
