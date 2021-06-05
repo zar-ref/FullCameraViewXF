@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Input;
+using Xamarin.Forms;
 
 namespace FullCameraXF.ViewModels
 {
@@ -34,12 +36,21 @@ namespace FullCameraXF.ViewModels
                 return hasFinishedTakingPhoto;
             }
         }
+
+        public ICommand AddPhotoCommand { get; set; }
+
         public CameraPageViewModel()
         {
             CameraDataStore = new CameraDataStore();
             FlashLightOn = false;
             HasFinishedTakingPhoto = false;
+            AddPhotoCommand = new Command(() => AddPhoto());
+        }
 
+        public async void AddPhoto()
+        {
+            CameraDataStore.AddPhotoToCameraFlowDataStorePhotoList();
+            await Application.Current.MainPage.Navigation.PopAsync();
         }
 }
 }

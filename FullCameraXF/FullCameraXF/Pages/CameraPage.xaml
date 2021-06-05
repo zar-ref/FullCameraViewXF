@@ -44,11 +44,13 @@
                     Source="icon_camera"  
                     BackgroundColor="Transparent"
                     HorizontalOptions="Center"
+                    Clicked="OnTakePhoto"
                     />
                 <ImageButton Grid.Column="3"
                     Source="icon_go"
                     BackgroundColor="Transparent"   
-                        />
+                    Clicked="OnAddPhoto"
+                    />
 
             </Grid>
         </Grid>

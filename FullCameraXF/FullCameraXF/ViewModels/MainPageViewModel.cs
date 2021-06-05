@@ -3,6 +3,7 @@ using FullCameraXF.Models;
 using FullCameraXF.Pages;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows.Input;
 using Xamarin.Forms;
@@ -16,7 +17,13 @@ namespace FullCameraXF.ViewModels
         public ICommand GoToPicturePageCommand { get; set; }
         public ICommand GoToCameraPageCommand { get; set; }
         public ICommand DeletePictureCommand { get; set; }
-
+        public List<PhotoModel> PhotoList
+        {
+            get
+            {
+                return CameraFlowDataStore.PhotoList.ToList();
+            }
+        }
         public MainPageViewModel()
         {
 
@@ -35,9 +42,10 @@ namespace FullCameraXF.ViewModels
             await Application.Current.MainPage.Navigation.PushAsync(new CameraPage());
         }
 
-        public  void DeletePicture(PhotoModel photo)
+        public void DeletePicture(PhotoModel photo)
         {
-            CameraFlowDataStore.DeletePhotoFromPhotoList(photo);
+            CameraFlowDataStore.DeletePhotoFromPhotoList(photo);      
+            MessagingCenter.Send<object>(this, "UpdatePhotoGallery");
         }
 
     }

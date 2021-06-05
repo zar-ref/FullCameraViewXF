@@ -20,6 +20,25 @@ namespace FullCameraXF.Pages
             _viewModel = new CameraPageViewModel();
             BindingContext = _viewModel;
         }
+        public void OnTakePhoto(object sender, System.EventArgs e)
+        {
+
+            MessagingCenter.Send<object>(this, "TakePhoto");
+            //MessagingCenter.Subscribe<object>(this, "HasFinishedTakingPhoto", (arg) =>
+            //{
+            //    _viewModel.HasFinishedTakingPhoto = true;
+
+            //});
+
+        }
+
+        public  void OnAddPhoto(object sender, System.EventArgs e)
+        {
+            //_viewModel.IsLoading = true;
+            _viewModel.AddPhotoCommand.Execute(null);
+            //_viewModel.IsLoading = false;
+        }
+
 
         public void OnToggleFlashLight(object sender, System.EventArgs e)
         {
@@ -47,16 +66,16 @@ namespace FullCameraXF.Pages
 
         protected override void OnDisappearing()
         {
-      
+
             base.OnDisappearing();
             cameraPreview.OnUnsubscribe();
- 
+
         }
         protected override void OnAppearing()
-        { 
-            base.OnDisappearing(); 
+        {
+            base.OnDisappearing();
             cameraPreview.OnSubscribe();
- 
+
         }
     }
 }
