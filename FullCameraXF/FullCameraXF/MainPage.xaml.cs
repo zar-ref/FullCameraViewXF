@@ -21,20 +21,19 @@ namespace FullCameraXF
             BindingContext = _viewModel;
         }
 
-        protected override async  void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
 
-             await Task.Run(async () =>
-              {
-                  _viewModel.IsLoading = true;
-                  //Device.BeginInvokeOnMainThread(() => { photoGalleryStack.Children.Clear(); });
-                  await ConstructPhotosGalleryAsync(_viewModel.PhotoList, 3);
-                  _viewModel.IsLoading = false;
-              });
+            await Task.Run(async () =>
+             {
+                 _viewModel.IsLoading = true;       
+                 await BeginInvokeOnMainThreadAsync(() => ConstructPhotosGalleryAsync(_viewModel.PhotoList, 3));
+                 _viewModel.IsLoading = false;
+             });
 
 
-       
+
             SubscribeToUpdatePhotosGalleryMessage();
         }
         protected override void OnDisappearing()
@@ -44,43 +43,37 @@ namespace FullCameraXF
         }
         public void SubscribeToUpdatePhotosGalleryMessage()
         {
-            MessagingCenter.Subscribe<object>(this, "UpdatePhotoGallery",  async (sender) =>
-            {
-                //_viewModel.IsLoading = true;
-                //await EmptyPhotosGallery();
-
-                ////photoGalleryStack.Children.Add(await ConstructPhotosGallery(_viewModel.PhotoList, 3));
-                //await ConstructPhotosGalleryAsync(_viewModel.PhotoList, 3);
-                //_viewModel.IsLoading = false;
-                await Task.Run(async () =>
-                {
-                    _viewModel.IsLoading = true;
-               
-                    await ConstructPhotosGalleryAsync(_viewModel.PhotoList, 3);
-                    _viewModel.IsLoading = false;
-                });
-            });
+            MessagingCenter.Subscribe<object>(this, "UpdatePhotoGallery", async (sender) =>
+           {
+              
+               await Task.Run(async () =>
+              {
+                  _viewModel.IsLoading = true;                   
+                  await BeginInvokeOnMainThreadAsync(() => ConstructPhotosGalleryAsync(_viewModel.PhotoList, 3));
+                  _viewModel.IsLoading = false;
+              });
+           });
 
         }
         public void UnsubscribeToUpdatePhotosGalleryMessage()
         {
             MessagingCenter.Unsubscribe<object>(this, "UpdatePhotoGallery");
         }
-        public Task EmptyPhotosGallery()
-        {
-            photoGalleryStack.Children.Clear();
-            return Task.CompletedTask;
-        }
+       
 
+     
         public async Task ConstructPhotosGalleryAsync(List<PhotoModel> photoList, int numberOfColumns)
         {
-            Device.BeginInvokeOnMainThread(() => { photoGalleryStack.Children.Clear(); });
+
+
+            photoGalleryStack.Children.Clear();
             StackLayout rowHorizontalStack = new StackLayout() { Orientation = StackOrientation.Horizontal, Margin = new Thickness(4) };
             if (photoList.Count == 0)
             {
                 rowHorizontalStack.Children.Add(await ConstructTakePhotoCardAsync());
-                Device.BeginInvokeOnMainThread(() => { photoGalleryStack.Children.Add(rowHorizontalStack); });
-                return ;
+                photoGalleryStack.Children.Add(rowHorizontalStack);
+
+                return;
             }
             for (int i = 0; i < photoList.Count + 1; i++)
             {
@@ -97,15 +90,13 @@ namespace FullCameraXF
 
                 if (i > 1 && (i + 1) % numberOfColumns == 0)
                 {
-                    //photoGalleryStack.Children.Add(rowHorizontalStack);
-                    Device.BeginInvokeOnMainThread(() => { photoGalleryStack.Children.Add(rowHorizontalStack); });
+                    photoGalleryStack.Children.Add(rowHorizontalStack);
                     rowHorizontalStack = new StackLayout() { Orientation = StackOrientation.Horizontal, Margin = new Thickness(4) };
                 }
             }
 
             if (rowHorizontalStack.Children.Count > 0)
-                Device.BeginInvokeOnMainThread(() => { photoGalleryStack.Children.Add(rowHorizontalStack); });
-       
+                photoGalleryStack.Children.Add(rowHorizontalStack);
             return;
         }
 
@@ -162,7 +153,7 @@ namespace FullCameraXF
                 //add command to delete image...
             };
             deletePhotoFrame.Content = deletePhotoBtn;
-            imgGrid.Children.Add(new ImageButton()
+            imgGrid.Children.Add(new Image()
             {
                 Source = item.PhotoImageSource,
                 VerticalOptions = LayoutOptions.FillAndExpand,
@@ -170,40 +161,38 @@ namespace FullCameraXF
                 Aspect = Aspect.AspectFill,
                 HeightRequest = 100,
                 WidthRequest = 100,
+                
+            }, 0, 0);
+            imgGrid.Children.Add(new Button()
+            {
+       
+                HeightRequest = 100,
+                WidthRequest = 100,
                 Command = _viewModel.GoToPicturePageCommand,
-                CommandParameter = item
+                CommandParameter = item,
+                BackgroundColor = Color.Transparent
             }, 0, 0);
             imgGrid.Children.Add(deletePhotoFrame, 0, 0);
             stack.Children.Add(imgGrid);
             return await Task.FromResult(stack);
         }
-        public StackLayout ConstructPhotoCardViewOnly(PhotoModel item, LayoutOptions position)
+
+        private Task<bool> BeginInvokeOnMainThreadAsync(Func<Task> a)
         {
-            StackLayout stack = new StackLayout() { HorizontalOptions = position };
-            Grid imgGrid = new Grid()
+            var tcs = new TaskCompletionSource<bool>();
+            Device.BeginInvokeOnMainThread(async () =>
             {
-                VerticalOptions = LayoutOptions.FillAndExpand,
-                HorizontalOptions = LayoutOptions.FillAndExpand,
-                RowDefinitions =
+                try
                 {
-                    new RowDefinition {Height = new GridLength(1 , GridUnitType.Star)}
+                    await a();
+                    tcs.SetResult(true);
                 }
-            };
-
-            imgGrid.Children.Add(new ImageButton()
-            {
-                Source = item.PhotoImageSource,
-                VerticalOptions = LayoutOptions.FillAndExpand,
-                HorizontalOptions = LayoutOptions.FillAndExpand,
-                Aspect = Aspect.AspectFill,
-                HeightRequest = 100,
-                WidthRequest = 100,
-                Command = _viewModel.GoToPicturePageCommand,
-                CommandParameter = item
-            }, 0, 0);
-
-            stack.Children.Add(imgGrid);
-            return stack;
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+            return tcs.Task;
         }
     }
 }
