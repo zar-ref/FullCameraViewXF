@@ -21,9 +21,7 @@ namespace FullCameraXF.Pages
             InitializeComponent();
             _viewModel = new CameraPageViewModel();
             BindingContext = _viewModel;
-            //var newCamera = new CameraPreview() { Camera = CameraOptions.Rear , HorizontalOptions = LayoutOptions.FillAndExpand , VerticalOptions = LayoutOptions.FillAndExpand};
-          
-            //cameraStack.Children.Add(newCamera);
+   
         }
         public void OnTakePhoto(object sender, System.EventArgs e)
         {
@@ -62,25 +60,18 @@ namespace FullCameraXF.Pages
         }
         public async void OnSwitchCamera(object sender, System.EventArgs e)
         {
-            //var currentCamera = (CameraPreview)cameraStack.Children.FirstOrDefault();
-            //if (currentCamera.Camera == CameraOptions.Rear)        
-  
+            
             if (cameraPreview.Camera == CameraOptions.Rear)
             {
                 MessagingCenter.Send<object>(this, "ToggleCameraFront");
-                await BeginInvokeOnMainThreadAsync(() => SwitchCamera(CameraOptions.Front));
-                 
-
+                await BeginInvokeOnMainThreadAsync(() => SwitchCamera(CameraOptions.Front));          
             }
 
             else
             {
                 MessagingCenter.Send<object>(this, "ToggleCameraRear");
                 await BeginInvokeOnMainThreadAsync(() => SwitchCamera(CameraOptions.Rear));
-            }
-
-
-
+            } 
         }
 
 
