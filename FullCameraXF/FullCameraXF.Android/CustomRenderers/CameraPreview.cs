@@ -45,6 +45,8 @@ namespace FullCameraXF.Droid.CustomRenderers
                 }
             }
         }
+
+        public static bool IsFrontCamera { get; set; } = false;
         public CameraPreview(Context context)
           : base(context)
         {
@@ -57,7 +59,7 @@ namespace FullCameraXF.Droid.CustomRenderers
             holder = surfaceView.Holder;
             holder.AddCallback(this);
 
-          
+
         }
         internal void Subscribe()
         {
@@ -107,6 +109,16 @@ namespace FullCameraXF.Droid.CustomRenderers
                 this.Preview.SetParameters(camParameters);
 
             });
+
+            MessagingCenter.Subscribe<object>(this, "ToggleCameraFront", (e) =>
+            {
+                IsFrontCamera = true;
+            });
+            MessagingCenter.Subscribe<object>(this, "ToggleCameraRear", (e) =>
+            {
+                IsFrontCamera = false;
+            });
+
         }
 
         internal void Unsubscribe()
@@ -114,6 +126,7 @@ namespace FullCameraXF.Droid.CustomRenderers
             MessagingCenter.Unsubscribe<object>(this, "TakePhoto");
             MessagingCenter.Unsubscribe<object>(this, "ToggleFlashLightOn");
             MessagingCenter.Unsubscribe<object>(this, "ToggleFlashLightOff");
+            MessagingCenter.Unsubscribe<object>(this, "ToggleCamera");
         }
 
         protected override void OnMeasure(int widthMeasureSpec, int heightMeasureSpec)
@@ -163,14 +176,13 @@ namespace FullCameraXF.Droid.CustomRenderers
                 Preview.SetPreviewCallback(null);
                 Preview.Release();
                 Preview = null;
-                //camera.Release();
 
-                //camera = null;
             }
         }
 
         public void SurfaceChanged(ISurfaceHolder holder, Android.Graphics.Format format, int width, int height)
         {
+
             var parameters = Preview.GetParameters();
             parameters.SetPreviewSize(previewSize.Width, previewSize.Height);
             RequestLayout();
@@ -180,7 +192,6 @@ namespace FullCameraXF.Droid.CustomRenderers
                 case SurfaceOrientation.Rotation0:
                     camera.SetDisplayOrientation(90); //default
                     parameters.SetRotation(90);
-                    //camera.SetDisplayOrientation(0);
                     break;
                 case SurfaceOrientation.Rotation90:
                     camera.SetDisplayOrientation(0);
@@ -249,22 +260,18 @@ namespace FullCameraXF.Droid.CustomRenderers
             if (data != null)
             {
                 try
-                {
-
-                    //var documentsPath = Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, Android.OS.Environment.DirectoryDownloads);
-                    //TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
-                    //var s = ts.TotalMilliseconds;
-                    //outStream = new FileOutputStream(documentsPath + "/" + s + ".jpg");
-                    //outStream.Write(data);
-                    //outStream.Close();
-
-                
-                    var byteArrayToconvert = AndroidImageHelper.ResizeImageAndroid(data, 675, 1200);
+                { 
+                    
+                    byte[] byteArrayToconvert = null;
+                    if (IsFrontCamera)
+                        byteArrayToconvert = AndroidImageHelper.ResizeAndRotateImageAndroid(data, 675, 1200, 180);
+                    else
+                        byteArrayToconvert = AndroidImageHelper.ResizeImageAndroid(data, 675, 1200);
                     var base64string = Convert.ToBase64String(byteArrayToconvert);
 
 
                     CameraDataStore.SetBase64Photo(base64string);
-                    //PhotosDataStore.SetHasFinishedTakingPhoto(true);
+                  
 
                     MessagingCenter.Send<object>(this, "HasFinishedTakingPhoto");
 

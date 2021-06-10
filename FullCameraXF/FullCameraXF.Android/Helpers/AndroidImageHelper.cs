@@ -33,20 +33,21 @@ namespace FullCameraXF.Droid.Helpers
         }
 
 
-        public static byte[] ResizeAndRotateImageAndroid(byte[] imageData, float width, float height)
+        public static byte[] ResizeAndRotateImageAndroid(byte[] imageData, float width, float height, int rotation)
         {
             // Load the bitmap
             Bitmap originalImage = BitmapFactory.DecodeByteArray(imageData, 0, imageData.Length);
 
             var matrix = new Matrix();
-            //matrix.PreRotate(90);
-            //matrix.PostScale(-1, 1);
+            matrix.PostRotate(rotation);
+            matrix.PreScale(-1, 1);
+            Bitmap resizedImage = Bitmap.CreateScaledBitmap(originalImage, (int)width, (int)height, false);
 
 
-            Bitmap resizedImage = Bitmap.CreateBitmap(originalImage, 0, 0, (int)width, (int)height, matrix, false);
+            Bitmap rotatedImage = Bitmap.CreateBitmap(resizedImage, 0, 0, (int)resizedImage.Width, (int)resizedImage.Height, matrix, false);
 
             var ms = new MemoryStream();
-            resizedImage.Compress(Bitmap.CompressFormat.Jpeg, 100, ms);
+            rotatedImage.Compress(Bitmap.CompressFormat.Jpeg, 70, ms);
             return ms.ToArray();
 
         }

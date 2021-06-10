@@ -7,7 +7,10 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <customRenderers:CameraPreview x:Name="cameraPreview" Grid.Row="0" Camera="Rear" HorizontalOptions="FillAndExpand" InputTransparent="True" VerticalOptions="FillAndExpand"/>
+        <StackLayout x:Name="cameraStack" Grid.Row="0" HorizontalOptions="FillAndExpand" InputTransparent="True" VerticalOptions="FillAndExpand">
+             <customRenderers:CameraPreview x:Name="cameraPreview"  Camera="Rear" HorizontalOptions="FillAndExpand" InputTransparent="True" VerticalOptions="FillAndExpand"/>
+       
+        </StackLayout>
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -49,6 +52,7 @@
                 <ImageButton Grid.Column="3"
                     Source="icon_go"
                     BackgroundColor="Transparent"   
+                    IsVisible="{Binding HasFinishedTakingPhoto}"
                     Clicked="OnAddPhoto"
                     />
 
