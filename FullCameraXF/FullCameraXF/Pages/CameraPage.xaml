@@ -51,10 +51,12 @@
                     />
                 <ImageButton Grid.Column="3"
                     Source="icon_go"
+
                     BackgroundColor="Transparent"   
                     IsVisible="{Binding HasFinishedTakingPhoto}"
                     Clicked="OnAddPhoto"
                     />
+
 
             </Grid>
         </Grid>

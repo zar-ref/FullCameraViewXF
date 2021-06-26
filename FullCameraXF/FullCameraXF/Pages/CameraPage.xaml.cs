@@ -92,9 +92,8 @@ namespace FullCameraXF.Pages
 
         public Task SwitchCamera(CameraOptions option)
         {
-            cameraStack.Children.Clear();
- 
             cameraPreview.OnUnsubscribe();
+            cameraStack.Children.Clear();           
             cameraPreview = null;
             cameraPreview = new CameraPreview() { Camera = option, HorizontalOptions = LayoutOptions.FillAndExpand, VerticalOptions = LayoutOptions.FillAndExpand };
              
@@ -119,6 +118,11 @@ namespace FullCameraXF.Pages
                 }
             });
             return tcs.Task;
+        }
+
+        void OnTakePicture(System.Object sender, System.EventArgs e)
+        {
+            MessagingCenter.Send<object>(this, "TakePhoto");
         }
     }
 }

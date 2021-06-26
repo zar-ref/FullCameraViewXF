@@ -4,6 +4,7 @@ using AVFoundation;
 using CoreGraphics;
 using Foundation;
 using FullCameraXF.DataStores;
+using FullCameraXF.iOS.Helpers;
 using FullCameraXF.ViewComponents.CustomRenderers;
 using UIKit;
 using Xamarin.Essentials;
@@ -86,6 +87,7 @@ namespace iOSCameraPOC.iOS.CustomRenderers
             CaptureSession.AddInput(input);
             CaptureSession.AddOutput(StillImageOutput);
             Layer.AddSublayer(previewLayer);
+
             CaptureSession.StartRunning();
             IsPreviewing = true;
 
@@ -100,9 +102,13 @@ namespace iOSCameraPOC.iOS.CustomRenderers
                 var sampleBuffer = await StillImageOutput.CaptureStillImageTaskAsync(videoConnection);
                 var jpegImageAsNsData = AVCaptureStillImageOutput.JpegStillToNSData(sampleBuffer);
                 var imageByteArray = jpegImageAsNsData.ToArray();
-                var base64string = Convert.ToBase64String(imageByteArray);
+                var resizedImageByteArray = IosImageHelper.ResizeImageIOS(imageByteArray, 675, 1200);              
+
+                var base64string = Convert.ToBase64String(resizedImageByteArray);
                 CameraDataStore.SetBase64Photo(base64string);
                 //PhotosDataStore.SetHasFinishedTakingPhoto(true);
+                CaptureSession.StopRunning();
+
                 MessagingCenter.Send<object>(this, "HasFinishedTakingPhoto");
             });
 
@@ -111,8 +117,25 @@ namespace iOSCameraPOC.iOS.CustomRenderers
 
                 try
                 {
-                    // Turn On Flashlight  
-                    await Flashlight.TurnOnAsync();
+
+                    var videoDevices = AVCaptureDevice.DevicesWithMediaType(AVMediaType.Video);
+                    var cameraPosition = (cameraOptions == CameraOptions.Front) ? AVCaptureDevicePosition.Front : AVCaptureDevicePosition.Back;
+                    var device = videoDevices.FirstOrDefault(d => d.Position == cameraPosition);
+                    var error = new NSError();
+                    if (device.HasFlash && !device.HasTorch) //front camera to take picture with flash
+                    {
+                        device.LockForConfiguration(out error);
+                        device.FlashMode = AVCaptureFlashMode.On;
+                        device.UnlockForConfiguration();
+                    }
+
+                    if (device.HasTorch)
+                    {
+                        device.LockForConfiguration(out error);
+
+                        device.TorchMode = AVCaptureTorchMode.On;
+                        device.UnlockForConfiguration();
+                    }
                 }
                 catch (FeatureNotSupportedException fnsEx)
                 {
@@ -132,8 +155,24 @@ namespace iOSCameraPOC.iOS.CustomRenderers
             {
                 try
                 {
-                    // Turn On Flashlight  
-                    await Flashlight.TurnOffAsync();
+
+                    var videoDevices = AVCaptureDevice.DevicesWithMediaType(AVMediaType.Video);
+                    var cameraPosition = (cameraOptions == CameraOptions.Front) ? AVCaptureDevicePosition.Front : AVCaptureDevicePosition.Back;
+                    var device = videoDevices.FirstOrDefault(d => d.Position == cameraPosition);
+                    var error = new NSError();
+
+                    if (device.HasFlash && !device.HasTorch) //front camera
+                    {
+                        device.LockForConfiguration(out error);
+                        device.FlashMode = AVCaptureFlashMode.Off;
+                        device.UnlockForConfiguration();
+                    }
+                    if (device.HasTorch)
+                    {
+                        device.LockForConfiguration(out error);
+                        device.TorchMode = AVCaptureTorchMode.Off;
+                        device.UnlockForConfiguration();
+                    }
                 }
                 catch (FeatureNotSupportedException fnsEx)
                 {
