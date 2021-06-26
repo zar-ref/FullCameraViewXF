@@ -102,7 +102,7 @@ namespace iOSCameraPOC.iOS.CustomRenderers
                 var sampleBuffer = await StillImageOutput.CaptureStillImageTaskAsync(videoConnection);
                 var jpegImageAsNsData = AVCaptureStillImageOutput.JpegStillToNSData(sampleBuffer);
                 var imageByteArray = jpegImageAsNsData.ToArray();
-                var resizedImageByteArray = IosImageHelper.ResizeImageIOS(imageByteArray, 675, 1200);              
+                var resizedImageByteArray = IosImageHelper.ResizeAndCompressImageIOS(imageByteArray, 675, 1200);              
 
                 var base64string = Convert.ToBase64String(resizedImageByteArray);
                 CameraDataStore.SetBase64Photo(base64string);
